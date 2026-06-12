@@ -1,0 +1,150 @@
+Behavioral Probing — ml-1m
+Model : ml-1m_ordered_model.pth
+Users : 6040  Items: 3416
+
+
+=================================================================
+  SASRec (sequential)  |  ml-1m  |  n=6040
+=================================================================
+  Proxy                                     R2    Spearman ρ       p-val
+  -----------------------------------------------------------------
+  Popularity Bias                       0.7250        0.8594    0.00e+00
+  Popularity Concentration              0.5100        0.7503   5.12e-219
+  Head-Tail Ratio                       0.5918        0.7691   1.09e-236
+  Recency Bias†                         0.2688        0.4991    4.51e-77
+  Popularity Momentum†                  0.1528        0.4379    9.01e-58
+  Rank Stability†                      -0.0119        0.0162    5.75e-01
+  † = order-dependent proxy
+
+=================================================================
+  SASRec (shuffled)  |  ml-1m  |  n=6040
+=================================================================
+  Proxy                                     R2    Spearman ρ       p-val
+  -----------------------------------------------------------------
+  Popularity Bias                       0.8037        0.9086    0.00e+00
+  Popularity Concentration              0.5513        0.7764   4.32e-244
+  Head-Tail Ratio                       0.6857        0.8204   4.51e-295
+  Recency Bias†                         0.1668        0.3790    1.50e-42
+  Popularity Momentum†                  0.1247        0.3660    1.34e-39
+  Rank Stability†                       0.0014        0.0457    1.12e-01
+  † = order-dependent proxy
+
+=================================================================
+  MF-SVD baseline  |  ml-1m  |  n=6040
+=================================================================
+  Proxy                                     R2    Spearman ρ       p-val
+  -----------------------------------------------------------------
+  Popularity Bias                       0.4929        0.7899   1.95e-258
+  Popularity Concentration              0.5141        0.8541    0.00e+00
+  Head-Tail Ratio                       0.4098        0.6625   1.72e-153
+  Recency Bias†                         0.0830        0.3146    3.63e-29
+  Popularity Momentum†                  0.0484        0.3305    3.48e-32
+  Rank Stability†                      -0.0010        0.0360    2.12e-01
+  † = order-dependent proxy
+
+=================================================================
+  Random Null  |  ml-1m  |  n=6040
+=================================================================
+  Proxy                                     R2    Spearman ρ       p-val
+  -----------------------------------------------------------------
+  Popularity Bias                      -0.0184       -0.0285    3.22e-01
+  Popularity Concentration             -0.0112        0.0300    2.97e-01
+  Head-Tail Ratio                      -0.0156       -0.0223    4.39e-01
+  Recency Bias†                        -0.0036        0.0340    2.37e-01
+  Popularity Momentum†                 -0.0168       -0.0179    5.34e-01
+  Rank Stability†                      -0.0105        0.0029    9.20e-01
+  † = order-dependent proxy
+
+==========================================================================================
+  Full Comparison — ml-1m  |  n=6040
+==========================================================================================
+  Proxy                                   SASRec   Shuffled     MF-SVD     Null   Δ seq-shuf
+  ---------------------------------------------------------------------------------------
+  Popularity Bias                         0.8594     0.9086     0.7899  -0.0285      -0.0492
+  Popularity Concentration                0.7503     0.7764     0.8541   0.0300      -0.0261
+  Head-Tail Ratio                         0.7691     0.8204     0.6625  -0.0223      -0.0513
+  Recency Bias†                           0.4991     0.3790     0.3146   0.0340       0.1201
+  Popularity Momentum†                    0.4379     0.3660     0.3305  -0.0179       0.0719
+  Rank Stability†                         0.0162     0.0457     0.0360   0.0029      -0.0296
+  Δ = SASRec(seq) − SASRec(shuffled). Positive Δ on order-dependent
+  proxies = sequence structure is being leveraged.
+  † = order-dependent proxy
+
+  ── Static vs Sequential Signal Summary ──
+                                   SASRec(seq)    SASRec(shuf)         Δ
+  Static proxies (avg ρ)                0.7929          0.8352   -0.0422
+  Dynamic proxies (avg ρ)               0.3177          0.2636    0.0541
+
+  Interpretation:
+    Sequential model gains on dynamic proxies after shuffle: +0.0541
+    Sequential model gains on static  proxies after shuffle: -0.0422
+    → Sequence structure contributes primarily to order-dependent signals.
+      Static behavioral traits are encoded regardless of interaction order.
+
+=================================================================
+  Proxy Correlation Matrix (Spearman ρ) — ml-1m
+=================================================================
+                 PopBias   PopConc  HT-Ratio   RecBias    PopMom  RankStab
+  --------------------------------------------------------------------------
+  PopBias          1.000     0.772    -0.833     0.187    -0.140    -0.037
+  PopConc          0.772     1.000    -0.418     0.180    -0.151    -0.056
+  HT-Ratio        -0.833    -0.418     1.000    -0.096     0.161     0.008
+  RecBias          0.187     0.180    -0.096     1.000     0.413    -0.078
+  PopMom          -0.140    -0.151     0.161     0.413     1.000    -0.021
+  RankStab        -0.037    -0.056     0.008    -0.078    -0.021     1.000
+
+  High correlations (|ρ| > 0.5) to note:
+    Popularity Bias  ↔  Popularity Concentration:  ρ = 0.772
+    Popularity Bias  ↔  Head-Tail Ratio:  ρ = -0.833
+
+=================================================================
+  Experiment 2: Cold-Start Stability — ml-1m
+  k values: [5, 10, 20, 50, 100]
+=================================================================
+  k          Popularity    Popularity    Head-Tail R   Recency Bia   Popularity    Rank Stabil
+  --------------------------------------------------------------------------------------------
+  5               0.2513        0.1274        0.2886        0.4253        0.1978        0.0049
+  10              0.4097        0.2453        0.4466        0.2657        0.1994        0.0287
+  20              0.5482        0.3243        0.5756        0.1361        0.1285       -0.0482
+  50              0.6826        0.4517        0.6776        0.2193        0.3224        0.0006
+  100             0.7667        0.6039        0.7129        0.3436        0.4173        0.0145
+  full            0.8594        0.7503        0.7691        0.4991        0.4379        0.0162
+
+  Stratified cold-start: split on 'Recency Bias'
+  High (top Q): n=1510  |  Low (bottom Q): n=1510
+
+  Signal emergence speed (avg ρ at k=5 → k=full, dynamic proxies):
+    Recency Bias                    High: 0.035→0.372 (gain=+0.337)  Low: 0.285→0.160 (gain=-0.126)  Faster emergence: Low
+    Popularity Momentum             High: 0.030→0.492 (gain=+0.462)  Low: 0.091→0.675 (gain=+0.584)  Faster emergence: Low
+    Rank Stability                  High: 0.133→0.020 (gain=-0.113)  Low: -0.085→0.085 (gain=+0.170)  Faster emergence: High
+
+=================================================================
+  Experiment 3: Behavior-Error Correlation — ml-1m
+  n=6040  |  error = 1 - rank_percentile
+=================================================================
+  Proxy                                  Spearman ρ       p-val  note
+  --------------------------------------------------------------------
+  Popularity Bias                           -0.0961    7.05e-14  easier users ↑
+  Popularity Concentration                  -0.0845    4.81e-11  easier users ↑
+  Head-Tail Ratio                            0.0883    6.07e-12  harder users ↑
+  Recency Bias                              -0.0964    5.95e-14  easier users ↑
+  Popularity Momentum                        0.0461    3.40e-04  harder users ↑
+  Rank Stability                             0.0121    3.49e-01  harder users ↑
+  Positive ρ: high proxy value → higher model error
+  Negative ρ: high proxy value → lower model error
+
+===========================================================================
+  Experiment 4: Behavioral Stratification — ml-1m
+  n=6040  |  overall NDCG@10 = 0.5922
+===========================================================================
+  Proxy                                  Q1 (low)        Q2        Q3   Q4 (high)     Q4−Q1
+  ----------------------------------------------------------------------------------
+  Popularity Bias                          0.5448    0.5805    0.6045      0.6390    0.0942
+  Popularity Concentration                 0.5484    0.5855    0.5959      0.6389    0.0905
+  Head-Tail Ratio                          0.6358    0.6022    0.5783      0.5524   -0.0834
+  Recency Bias†                            0.5453    0.5762    0.6056      0.6417    0.0965
+  Popularity Momentum†                     0.6496    0.5930    0.5111      0.6150   -0.0346
+  Rank Stability†                          0.6151    0.5807    0.5497      0.6233    0.0082
+  Q4−Q1: NDCG difference between highest and lowest proxy quartile.
+  Negative Q4−Q1 = high proxy value → harder users.
+  † = order-dependent proxy
